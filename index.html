@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Churn Intelligence — Advanced Retention Analytics</title>
+  <meta name="description" content="Enterprise-grade Customer Churn Prediction & Retention Analytics Platform" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <!-- Chart.js Matrix plugin for heatmaps -->
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@2.0.1/dist/chartjs-chart-matrix.min.js"></script>
+
+  <!-- SheetJS / XLSX -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════ LOADING SCREEN ═══ -->
+  <div id="loadingScreen" class="loading-screen" aria-live="polite" aria-label="Loading dashboard">
+    <div class="loading-content">
+      <div class="loading-logo">
+        <div class="logo-icon-ring">
+          <i class="fa-solid fa-chart-mixed-up-circle-dollar"></i>
+        </div>
+        <h1>Customer Churn Intelligence</h1>
+        <p>Advanced Retention & Prediction Analytics</p>
+      </div>
+      <div class="loading-progress-wrap">
+        <div class="loading-bar-track">
+          <div class="loading-bar-fill" id="loadingBar"></div>
+        </div>
+        <span class="loading-status" id="loadingStatus">Initializing Churn Intelligence Engine...</span>
+      </div>
+      <div class="loading-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <canvas id="loadingParticles" class="loading-particles"></canvas>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ TOAST CONTAINER ═══ -->
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ═══════════════════════════════════════════ MAIN APP ═══ -->
+  <div id="app" class="app" style="opacity:0">
+
+    <!-- ── SIDEBAR ── -->
+    <aside id="sidebar" class="sidebar" role="navigation" aria-label="Main navigation">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="brand-icon">
+            <i class="fa-solid fa-brain-circuit"></i>
+          </div>
+          <div class="brand-text">
+            <span class="brand-name">ChurnIQ</span>
+            <span class="brand-tagline">Intelligence Platform</span>
+          </div>
+        </div>
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar" title="Toggle sidebar">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+
+      <div class="sidebar-search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Search..." id="sidebarSearch" aria-label="Search navigation" />
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">ANALYTICS</div>
+        <ul role="list">
+          <li>
+            <a href="#" class="nav-item active" data-section="dashboard" role="menuitem">
+              <span class="nav-icon"><i class="fa-solid fa-grid-2"></i></span>
+              <span class="nav-label">Dashboard</span>
+              <span class="nav-badge">Live</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-section="churnOverview" role="menuitem">
+              <span class="nav-icon"><i class="fa-solid fa-chart-line-down"></i></span>
+              <span class="nav-label">Churn Overview</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-section="customers" role="menuitem">
+              <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
+              <span class="nav-label">Customers</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-section="prediction" role="menuitem">
+              <span class="nav-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+              <span class="nav-label">Churn Prediction</span>
+              <span class="nav-badge ai">AI</span>
+            </a>
+          </li>
+        </ul>
+
+        <div class="nav-section-label">INTELLIGENCE</div>
+        <ul role="list">
+          <li>
+            <a href="#" class="nav-item" data-section="segments" role="menuitem">
+              <span class="nav-icon"><i class="fa-solid fa-layer-group"></i></span>
+              <span class="nav-label">Segments</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-section="churnDrivers" role="menuitem">
+              <span class="nav-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
+              <span class="nav-label">Churn Drivers</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-section="revenueRisk" role="menuitem">
+              <span class="nav-icon"><i class="fa-solid fa-sack-dollar"></i></span>
+              <span class="nav-label">Revenue at Risk</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-section="retention" role="menuitem">
+              <span class="nav-icon"><i class="fa-solid fa-shield-halved"></i></span>
+              <span class="nav-label">Retention</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-section="cohorts" role="menuitem">
+              <span class="nav-icon"><i class="fa-solid fa-table-cells"></i></span>
+              <span class="nav-label">Cohorts</span>
+            </a>
+          </li>
+        </ul>
+
+        <div class="nav-section-label">TOOLS</div>
+        <ul role="list">
+          <li>
+            <a href="#" class="nav-item" data-section="reports" role="menuitem">
+              <span class="nav-icon"><i class="fa-solid fa-file-chart-column"></i></span>
+              <span class="nav-label">Reports</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-section="dataImport" role="menuitem">
+              <span class="nav-icon"><i class="fa-solid fa-cloud-arrow-up"></i></span>
+              <span class="nav-label">Data Import</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-section="settings" role="menuitem">
+              <span class="nav-icon"><i class="fa-solid fa-sliders"></i></span>
+              <span class="nav-label">Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="engine-status">
+          <span class="status-dot pulse"></span>
+          <span>Analytics Engine Active</span>
+        </div>
+        <div class="sidebar-version">v3.1.0 Enterprise</div>
+      </div>
+    </aside>
+
+    <!-- ── MAIN CONTENT ── -->
+    <div class="main-wrapper" id="mainWrapper">
+
+      <!-- TOP HEADER -->
+      <header class="top-header" role="banner">
+        <div class="header-left">
+          <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="header-title">
+            <h1>Customer Churn Intelligence</h1>
+            <p>Advanced Customer Retention &amp; Churn Prediction Analytics</p>
+          </div>
+        </div>
+        <div class="header-right">
+          <div class="header-search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="globalSearch" placeholder="Search customers, IDs, states..." aria-label="Global search" />
+            <div class="search-results-dropdown" id="searchDropdown"></div>
+          </div>
+
+          <div class="header-date-range">
+            <i class="fa-regular fa-calendar-range"></i>
+            <select id="dateRangeFilter" aria-label="Date range filter">
+              <option value="all">All Time</option>
+              <option value="30">Last 30 Days</option>
+              <option value="90">Last 90 Days</option>
+              <option value="180">Last 6 Months</option>
+              <option value="365">Last 12 Months</option>
+            </select>
+          </div>
+
+          <button class="header-btn" id="refreshBtn" title="Refresh Data" aria-label="Refresh data">
+            <i class="fa-solid fa-arrows-rotate"></i>
+          </button>
+
+          <div class="header-import-export-group">
+            <button class="header-btn accent" id="importCsvBtn" title="Import CSV" aria-label="Import CSV file">
+              <i class="fa-solid fa-file-csv"></i>
+              <span>Import CSV</span>
+            </button>
+            <button class="header-btn accent" id="importExcelBtn" title="Import Excel" aria-label="Import Excel file">
+              <i class="fa-solid fa-file-excel"></i>
+              <span>Import Excel</span>
+            </button>
+            <button class="header-btn success" id="exportCsvBtn" title="Export CSV" aria-label="Export CSV file">
+              <i class="fa-solid fa-download"></i>
+              <span>Export CSV</span>
+            </button>
+            <button class="header-btn success" id="exportExcelBtn" title="Export Excel" aria-label="Export Excel file">
+              <i class="fa-solid fa-file-export"></i>
+              <span>Export Excel</span>
+            </button>
+          </div>
+
+          <!-- Hidden file inputs -->
+          <input type="file" id="csvFileInput" accept=".csv" style="display:none" aria-label="Select CSV file" />
+          <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display:none" aria-label="Select Excel file" />
+
+          <div class="header-right-icons">
+            <button class="icon-btn" id="notificationBtn" aria-label="Notifications" title="Notifications">
+              <i class="fa-regular fa-bell"></i>
+              <span class="badge" id="notifBadge">3</span>
+            </button>
+            <div class="profile-avatar" title="User Profile" role="button" tabindex="0" aria-label="User profile">
+              <span>SA</span>
+            </div>
+          </div>
+
+          <div class="live-indicator" title="System Status">
+            <span class="live-dot pulse-green"></span>
+            <span>Analytics Engine Active</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- GLOBAL FILTER BAR -->
+      <div class="filter-bar" id="filterBar" role="search" aria-label="Dashboard filters">
+        <div class="filter-bar-inner">
+          <span class="filter-label"><i class="fa-solid fa-filter"></i> Filters:</span>
+
+          <select id="filterRisk" aria-label="Filter by risk level">
+            <option value="">All Risk Levels</option>
+            <option value="Low">Low Risk</option>
+            <option value="Medium">Medium Risk</option>
+            <option value="High">High Risk</option>
+            <option value="Critical">Critical Risk</option>
+          </select>
+
+          <select id="filterChurn" aria-label="Filter by churn status">
+            <option value="">All Customers</option>
+            <option value="1">Churned</option>
+            <option value="0">Active</option>
+          </select>
+
+          <select id="filterContract" aria-label="Filter by contract type">
+            <option value="">All Contracts</option>
+            <option value="Monthly">Monthly</option>
+            <option value="Quarterly">Quarterly</option>
+            <option value="Annual">Annual</option>
+            <option value="Two-Year">Two-Year</option>
+          </select>
+
+          <select id="filterPlan" aria-label="Filter by plan">
+            <option value="">All Plans</option>
+            <option value="Basic">Basic</option>
+            <option value="Standard">Standard</option>
+            <option value="Premium">Premium</option>
+            <option value="Enterprise">Enterprise</option>
+          </select>
+
+          <select id="filterGender" aria-label="Filter by gender">
+            <option value="">All Genders</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+
+          <select id="filterAgeGroup" aria-label="Filter by age group">
+            <option value="">All Ages</option>
+            <option value="18-25">18–25</option>
+            <option value="26-35">26–35</option>
+            <option value="36-45">36–45</option>
+            <option value="46-55">46–55</option>
+            <option value="56-65">56–65</option>
+            <option value="65+">65+</option>
+          </select>
+
+          <select id="filterPayment" aria-label="Filter by payment method">
+            <option value="">All Payments</option>
+            <option value="UPI">UPI</option>
+            <option value="Credit Card">Credit Card</option>
+            <option value="Debit Card">Debit Card</option>
+            <option value="Bank Transfer">Bank Transfer</option>
+            <option value="Wallet">Wallet</option>
+            <option value="Auto Payment">Auto Payment</option>
+            <option value="Cash">Cash</option>
+          </select>
+
+          <button class="filter-apply-btn" id="applyFiltersBtn" aria-label="Apply filters">
+            <i class="fa-solid fa-check"></i> Apply
+          </button>
+          <button class="filter-reset-btn" id="resetFiltersBtn" aria-label="Reset filters">
+            <i class="fa-solid fa-rotate-left"></i> Reset
+          </button>
+
+          <button class="generate-demo-btn" id="generateDemoBtn" aria-label="Generate demo dataset">
+            <i class="fa-solid fa-wand-sparkles"></i> Generate Demo Dataset
+          </button>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════ SECTIONS ══ -->
+      <main class="content-area" id="contentArea" role="main">
+
+        <!-- ─────────────── SECTION: DASHBOARD ─────────────── -->
+        <section id="section-dashboard" class="section active" aria-label="Dashboard">
+
+          <!-- KPI GRID -->
+          <div class="section-header">
+            <h2><i class="fa-solid fa-grid-2"></i> Overview Dashboard</h2>
+            <span class="last-updated" id="lastUpdated">Last updated: —</span>
+          </div>
+
+          <div class="kpi-grid" id="kpiGrid" role="list" aria-label="Key Performance Indicators">
+            <!-- KPIs injected by JS -->
+          </div>
+
+          <!-- QUICK INSIGHTS ROW -->
+          <div class="insights-bar" id="insightsBar">
+            <!-- Dynamic insights injected by JS -->
+          </div>
+
+          <!-- CHARTS ROW 1 -->
+          <div class="charts-row two-col">
+            <div class="card chart-card">
+              <div class="card-header">
+                <div class="card-title-wrap">
+                  <i class="fa-solid fa-chart-area"></i>
+                  <h3>Churn Rate Trend</h3>
+                </div>
+                <div class="card-actions">
+                  <button class="chart-type-btn active" data-chart="churnTrend" data-type="line" aria-label="Line chart">Line</button>
+                  <button class="chart-type-btn" data-chart="churnTrend" data-type="bar" aria-label="Bar chart">Bar</button>
+                </div>
+              </div>
+              <div class="chart-container"><canvas id="churnTrendChart" aria-label="Churn Rate Trend Chart"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header">
+                <div class="card-title-wrap">
+                  <i class="fa-solid fa-chart-pie"></i>
+                  <h3>Churn vs Retained</h3>
+                </div>
+              </div>
+              <div class="chart-container doughnut-wrap">
+                <canvas id="churnDistChart" aria-label="Churn Distribution Chart"></canvas>
+                <div class="doughnut-center" id="churnDistCenter"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- CHARTS ROW 2 -->
+          <div class="charts-row three-col">
+            <div class="card chart-card">
+              <div class="card-header">
+                <div class="card-title-wrap">
+                  <i class="fa-solid fa-signal"></i>
+                  <h3>Risk Distribution</h3>
+                </div>
+              </div>
+              <div class="chart-container"><canvas id="riskDistChart" aria-label="Risk Distribution Chart"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header">
+                <div class="card-title-wrap">
+                  <i class="fa-solid fa-file-contract"></i>
+                  <h3>Churn by Contract</h3>
+                </div>
+              </div>
+              <div class="chart-container"><canvas id="churnByContractChart" aria-label="Churn by Contract Chart"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header">
+                <div class="card-title-wrap">
+                  <i class="fa-solid fa-tags"></i>
+                  <h3>Churn by Plan</h3>
+                </div>
+              </div>
+              <div class="chart-container"><canvas id="churnByPlanChart" aria-label="Churn by Plan Chart"></canvas></div>
+            </div>
+          </div>
+
+          <!-- CHARTS ROW 3 -->
+          <div class="charts-row two-col">
+            <div class="card chart-card">
+              <div class="card-header">
+                <div class="card-title-wrap">
+                  <i class="fa-solid fa-users-between-lines"></i>
+                  <h3>Churn by Age Group</h3>
+                </div>
+              </div>
+              <div class="chart-container"><canvas id="churnByAgeChart" aria-label="Churn by Age Group Chart"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header">
+                <div class="card-title-wrap">
+                  <i class="fa-solid fa-hourglass-half"></i>
+                  <h3>Churn by Tenure</h3>
+                </div>
+              </div>
+              <div class="chart-container"><canvas id="churnByTenureChart" aria-label="Churn by Tenure Chart"></canvas></div>
+            </div>
+          </div>
+
+          <!-- HIGH RISK TABLE -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-wrap">
+                <i class="fa-solid fa-fire"></i>
+                <h3>Customers Requiring Immediate Attention</h3>
+              </div>
+              <span class="card-badge danger" id="highRiskCount">—</span>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table high-risk-table" id="highRiskTable" aria-label="High risk customers">
+                <thead>
+                  <tr>
+                    <th>Customer</th>
+                    <th>Churn Prob.</th>
+                    <th>Risk</th>
+                    <th>CLV</th>
+                    <th>Rev. at Risk</th>
+                    <th>Main Driver</th>
+                    <th>Recommended Action</th>
+                  </tr>
+                </thead>
+                <tbody id="highRiskTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- AI INSIGHTS -->
+          <div class="card insights-card">
+            <div class="card-header">
+              <div class="card-title-wrap">
+                <i class="fa-solid fa-robot"></i>
+                <h3>Intelligent Churn Insights</h3>
+                <span class="ai-badge">AI-Powered</span>
+              </div>
+              <button class="refresh-insights-btn" id="refreshInsightsBtn" aria-label="Refresh insights">
+                <i class="fa-solid fa-sparkles"></i> Refresh
+              </button>
+            </div>
+            <div class="insights-grid" id="insightsGrid"></div>
+          </div>
+
+        </section>
+
+        <!-- ─────────────── SECTION: CHURN OVERVIEW ─────────────── -->
+        <section id="section-churnOverview" class="section" aria-label="Churn Overview">
+          <div class="section-header">
+            <h2><i class="fa-solid fa-chart-line-down"></i> Churn Overview</h2>
+          </div>
+
+          <div class="charts-row two-col">
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-calendar-days"></i><h3>Monthly Churn Analysis</h3></div></div>
+              <div class="chart-container tall"><canvas id="monthlyChurnChart" aria-label="Monthly Churn Chart"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-chart-simple"></i><h3>Quarterly Churn Trend</h3></div></div>
+              <div class="chart-container tall"><canvas id="quarterlyChurnChart" aria-label="Quarterly Churn Chart"></canvas></div>
+            </div>
+          </div>
+
+          <div class="charts-row three-col">
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-venus-mars"></i><h3>Churn by Gender</h3></div></div>
+              <div class="chart-container"><canvas id="churnByGenderChart" aria-label="Churn by Gender Chart"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-credit-card"></i><h3>Churn by Payment Method</h3></div></div>
+              <div class="chart-container"><canvas id="churnByPaymentChart" aria-label="Churn by Payment Method Chart"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-wifi"></i><h3>Churn by Internet Service</h3></div></div>
+              <div class="chart-container"><canvas id="churnByInternetChart" aria-label="Churn by Internet Service Chart"></canvas></div>
+            </div>
+          </div>
+
+          <div class="charts-row two-col">
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-spider-web"></i><h3>Risk Profile Radar</h3></div></div>
+              <div class="chart-container"><canvas id="riskRadarChart" aria-label="Risk Profile Radar Chart"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-circle-half-stroke"></i><h3>Churn by Device Type</h3></div></div>
+              <div class="chart-container"><canvas id="churnByDeviceChart" aria-label="Churn by Device Type Chart"></canvas></div>
+            </div>
+          </div>
+
+          <!-- Correlation Heatmap -->
+          <div class="card chart-card">
+            <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-table-cells-large"></i><h3>Correlation Matrix — Churn Drivers</h3></div></div>
+            <div class="chart-container extra-tall"><canvas id="correlationHeatmapChart" aria-label="Correlation Heatmap Chart"></canvas></div>
+          </div>
+        </section>
+
+        <!-- ─────────────── SECTION: CUSTOMERS ─────────────── -->
+        <section id="section-customers" class="section" aria-label="Customer Table">
+          <div class="section-header">
+            <h2><i class="fa-solid fa-users"></i> Customer Analytics</h2>
+            <div class="section-header-actions">
+              <span class="record-count" id="tableRecordCount">— records</span>
+            </div>
+          </div>
+
+          <!-- Customer Table Filters -->
+          <div class="card table-filter-card">
+            <div class="table-filters-row">
+              <div class="search-input-wrap">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="tableSearch" placeholder="Search by name, ID, city..." aria-label="Search customers table" />
+              </div>
+              <select id="tableFilterRisk" aria-label="Filter table by risk">
+                <option value="">All Risk</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                <option value="Critical">Critical</option>
+              </select>
+              <select id="tableFilterChurn" aria-label="Filter table by churn">
+                <option value="">All Churn</option>
+                <option value="1">Churned</option>
+                <option value="0">Active</option>
+              </select>
+              <select id="tableFilterContract" aria-label="Filter table by contract">
+                <option value="">All Contracts</option>
+                <option value="Monthly">Monthly</option>
+                <option value="Quarterly">Quarterly</option>
+                <option value="Annual">Annual</option>
+                <option value="Two-Year">Two-Year</option>
+              </select>
+              <select id="tableFilterPlan" aria-label="Filter table by plan">
+                <option value="">All Plans</option>
+                <option value="Basic">Basic</option>
+                <option value="Standard">Standard</option>
+                <option value="Premium">Premium</option>
+                <option value="Enterprise">Enterprise</option>
+              </select>
+              <select id="tableFilterState" aria-label="Filter table by state">
+                <option value="">All States</option>
+              </select>
+              <button class="filter-apply-btn" id="tableApplyFilter" aria-label="Apply table filters"><i class="fa-solid fa-filter"></i> Filter</button>
+            </div>
+          </div>
+
+          <!-- Data Table -->
+          <div class="card">
+            <div class="table-responsive">
+              <table class="data-table customer-table sortable-table" id="customerTable" aria-label="Customer data table">
+                <thead>
+                  <tr>
+                    <th data-sort="customer_id" tabindex="0">ID <i class="fa-solid fa-sort"></i></th>
+                    <th data-sort="customer_name" tabindex="0">Customer <i class="fa-solid fa-sort"></i></th>
+                    <th data-sort="age" tabindex="0">Age <i class="fa-solid fa-sort"></i></th>
+                    <th data-sort="state" tabindex="0">State <i class="fa-solid fa-sort"></i></th>
+                    <th data-sort="tenure_months" tabindex="0">Tenure <i class="fa-solid fa-sort"></i></th>
+                    <th data-sort="contract_type" tabindex="0">Contract <i class="fa-solid fa-sort"></i></th>
+                    <th data-sort="subscription_plan" tabindex="0">Plan <i class="fa-solid fa-sort"></i></th>
+                    <th data-sort="monthly_charges" tabindex="0">Monthly ₹ <i class="fa-solid fa-sort"></i></th>
+                    <th data-sort="customer_lifetime_value" tabindex="0">CLV <i class="fa-solid fa-sort"></i></th>
+                    <th data-sort="satisfaction_score" tabindex="0">Satisfaction <i class="fa-solid fa-sort"></i></th>
+                    <th data-sort="support_tickets" tabindex="0">Tickets <i class="fa-solid fa-sort"></i></th>
+                    <th data-sort="engagement_score" tabindex="0">Engagement <i class="fa-solid fa-sort"></i></th>
+                    <th data-sort="churn_probability" tabindex="0">Churn Prob. <i class="fa-solid fa-sort"></i></th>
+                    <th>Risk</th>
+                    <th data-sort="churn" tabindex="0">Churn <i class="fa-solid fa-sort"></i></th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="customerTableBody"></tbody>
+              </table>
+            </div>
+            <div class="pagination-wrap" id="paginationWrap" aria-label="Table pagination"></div>
+          </div>
+        </section>
+
+        <!-- ─────────────── SECTION: CHURN PREDICTION ─────────────── -->
+        <section id="section-prediction" class="section" aria-label="Churn Prediction">
+          <div class="section-header">
+            <h2><i class="fa-solid fa-wand-magic-sparkles"></i> Churn Prediction Engine</h2>
+            <span class="demo-label"><i class="fa-solid fa-flask"></i> Demo Predictive Scoring Model</span>
+          </div>
+
+          <div class="prediction-layout">
+            <!-- Input Form -->
+            <div class="card prediction-form-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-sliders"></i><h3>Customer Risk Assessment</h3></div></div>
+              <div class="prediction-form" id="predictionForm">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="pred_customer_id">Customer ID</label>
+                    <input type="text" id="pred_customer_id" placeholder="e.g. CCI-00042" />
+                  </div>
+                  <div class="form-group">
+                    <label for="pred_age">Age</label>
+                    <input type="number" id="pred_age" min="18" max="80" value="35" />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="pred_tenure">Tenure (months)</label>
+                    <input type="number" id="pred_tenure" min="1" max="120" value="12" />
+                  </div>
+                  <div class="form-group">
+                    <label for="pred_contract">Contract Type</label>
+                    <select id="pred_contract">
+                      <option value="Monthly">Monthly</option>
+                      <option value="Quarterly">Quarterly</option>
+                      <option value="Annual">Annual</option>
+                      <option value="Two-Year">Two-Year</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="pred_charges">Monthly Charges (₹)</label>
+                    <input type="number" id="pred_charges" min="100" max="5000" value="999" />
+                  </div>
+                  <div class="form-group">
+                    <label for="pred_support">Support Tickets</label>
+                    <input type="number" id="pred_support" min="0" max="20" value="2" />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="pred_satisfaction">Satisfaction Score (1–10)</label>
+                    <input type="range" id="pred_satisfaction" min="1" max="10" value="6" class="range-input" />
+                    <span class="range-value" id="pred_satisfaction_val">6</span>
+                  </div>
+                  <div class="form-group">
+                    <label for="pred_nps">NPS Score (0–10)</label>
+                    <input type="range" id="pred_nps" min="0" max="10" value="5" class="range-input" />
+                    <span class="range-value" id="pred_nps_val">5</span>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="pred_login_freq">Login Frequency (per month)</label>
+                    <input type="number" id="pred_login_freq" min="0" max="31" value="8" />
+                  </div>
+                  <div class="form-group">
+                    <label for="pred_last_login">Last Login (days ago)</label>
+                    <input type="number" id="pred_last_login" min="0" max="365" value="15" />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="pred_complaints">Complaints</label>
+                    <input type="number" id="pred_complaints" min="0" max="10" value="1" />
+                  </div>
+                  <div class="form-group">
+                    <label for="pred_late_payments">Late Payments</label>
+                    <input type="number" id="pred_late_payments" min="0" max="12" value="0" />
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="pred_engagement">Engagement Score (0–100)</label>
+                    <input type="range" id="pred_engagement" min="0" max="100" value="55" class="range-input" />
+                    <span class="range-value" id="pred_engagement_val">55</span>
+                  </div>
+                  <div class="form-group">
+                    <label for="pred_service_quality">Service Quality (0–100)</label>
+                    <input type="range" id="pred_service_quality" min="0" max="100" value="60" class="range-input" />
+                    <span class="range-value" id="pred_service_quality_val">60</span>
+                  </div>
+                </div>
+                <button class="predict-btn" id="predictBtn" aria-label="Predict churn risk">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i>
+                  Predict Churn Risk
+                </button>
+              </div>
+            </div>
+
+            <!-- Prediction Result -->
+            <div class="card prediction-result-card" id="predictionResultCard">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-gauge-high"></i><h3>Prediction Result</h3></div></div>
+              <div class="prediction-result" id="predictionResult">
+                <div class="prediction-placeholder">
+                  <i class="fa-solid fa-wand-sparkles"></i>
+                  <p>Enter customer parameters and click<br/><strong>Predict Churn Risk</strong> to see the result.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scatter Charts for Prediction Context -->
+          <div class="charts-row two-col">
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-scatter-chart"></i><h3>Monthly Charges vs Churn Probability</h3></div></div>
+              <div class="chart-container"><canvas id="scatterChargesChurnChart" aria-label="Monthly Charges vs Churn Probability Scatter"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-scatter-chart"></i><h3>Satisfaction vs Churn Probability</h3></div></div>
+              <div class="chart-container"><canvas id="scatterSatisfactionChurnChart" aria-label="Satisfaction vs Churn Probability Scatter"></canvas></div>
+            </div>
+          </div>
+          <div class="charts-row two-col">
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-scatter-chart"></i><h3>Tenure vs Churn Probability</h3></div></div>
+              <div class="chart-container"><canvas id="scatterTenureChurnChart" aria-label="Tenure vs Churn Probability Scatter"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-scatter-chart"></i><h3>Engagement vs Churn Probability</h3></div></div>
+              <div class="chart-container"><canvas id="scatterEngagementChurnChart" aria-label="Engagement vs Churn Probability Scatter"></canvas></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─────────────── SECTION: SEGMENTS ─────────────── -->
+        <section id="section-segments" class="section" aria-label="Customer Segments">
+          <div class="section-header">
+            <h2><i class="fa-solid fa-layer-group"></i> Customer Segmentation</h2>
+          </div>
+
+          <div class="charts-row two-col">
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-chart-pie"></i><h3>Customer Segments Distribution</h3></div></div>
+              <div class="chart-container"><canvas id="segmentDistChart" aria-label="Segment Distribution Chart"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-chart-bar"></i><h3>Revenue by Segment</h3></div></div>
+              <div class="chart-container"><canvas id="segmentRevenueChart" aria-label="Revenue by Segment Chart"></canvas></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-table"></i><h3>Segment Analysis</h3></div></div>
+            <div class="table-responsive">
+              <table class="data-table" id="segmentTable" aria-label="Customer Segments Table">
+                <thead>
+                  <tr>
+                    <th>Segment</th>
+                    <th>Customers</th>
+                    <th>% of Total</th>
+                    <th>Avg CLV</th>
+                    <th>Total Revenue</th>
+                    <th>Churn Rate</th>
+                    <th>Avg Satisfaction</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="segmentTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="charts-row two-col">
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-chart-scatter"></i><h3>CLV vs Churn Probability</h3></div></div>
+              <div class="chart-container"><canvas id="clvChurnScatterChart" aria-label="CLV vs Churn Probability Scatter"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-chart-bar"></i><h3>CLV by Contract Type</h3></div></div>
+              <div class="chart-container"><canvas id="clvByContractChart" aria-label="CLV by Contract Chart"></canvas></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─────────────── SECTION: CHURN DRIVERS ─────────────── -->
+        <section id="section-churnDrivers" class="section" aria-label="Churn Drivers">
+          <div class="section-header">
+            <h2><i class="fa-solid fa-triangle-exclamation"></i> Churn Drivers Analysis</h2>
+          </div>
+
+          <div class="charts-row two-col">
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-ranking-star"></i><h3>Top Churn Drivers — Impact Score</h3></div></div>
+              <div class="chart-container tall"><canvas id="churnDriversChart" aria-label="Churn Drivers Chart"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-chart-polar"></i><h3>Driver Distribution</h3></div></div>
+              <div class="chart-container tall"><canvas id="churnDriversPolarChart" aria-label="Churn Drivers Polar Chart"></canvas></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-table"></i><h3>Driver Analysis Detail</h3></div></div>
+            <div id="churnDriversDetail" class="drivers-detail-grid"></div>
+          </div>
+
+          <!-- Support Tickets Analysis -->
+          <div class="charts-row two-col">
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-ticket"></i><h3>Support Tickets vs Churn Probability</h3></div></div>
+              <div class="chart-container"><canvas id="scatterTicketsChurnChart" aria-label="Support Tickets vs Churn Scatter"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-heart-crack"></i><h3>Churn by Complaint Level</h3></div></div>
+              <div class="chart-container"><canvas id="churnByComplaintsChart" aria-label="Churn by Complaints Chart"></canvas></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─────────────── SECTION: REVENUE AT RISK ─────────────── -->
+        <section id="section-revenueRisk" class="section" aria-label="Revenue at Risk">
+          <div class="section-header">
+            <h2><i class="fa-solid fa-sack-dollar"></i> Revenue at Risk</h2>
+          </div>
+
+          <div class="kpi-grid small-kpi" id="revenueKpiGrid"></div>
+
+          <div class="charts-row two-col">
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-chart-area"></i><h3>Monthly Revenue at Risk</h3></div></div>
+              <div class="chart-container"><canvas id="monthlyRevenueRiskChart" aria-label="Monthly Revenue at Risk Chart"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-chart-pie"></i><h3>Revenue at Risk by Segment</h3></div></div>
+              <div class="chart-container"><canvas id="revenueRiskBySegmentChart" aria-label="Revenue at Risk by Segment Chart"></canvas></div>
+            </div>
+          </div>
+
+          <div class="charts-row three-col">
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-tags"></i><h3>Rev. at Risk by Plan</h3></div></div>
+              <div class="chart-container"><canvas id="revenueRiskByPlanChart" aria-label="Revenue at Risk by Plan Chart"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-map"></i><h3>Rev. at Risk by State</h3></div></div>
+              <div class="chart-container"><canvas id="revenueRiskByStateChart" aria-label="Revenue at Risk by State Chart"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-file-contract"></i><h3>Rev. at Risk by Contract</h3></div></div>
+              <div class="chart-container"><canvas id="revenueRiskByContractChart" aria-label="Revenue at Risk by Contract Chart"></canvas></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─────────────── SECTION: RETENTION ─────────────── -->
+        <section id="section-retention" class="section" aria-label="Retention Analytics">
+          <div class="section-header">
+            <h2><i class="fa-solid fa-shield-halved"></i> Retention Analytics</h2>
+          </div>
+
+          <div class="charts-row two-col">
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-chart-line"></i><h3>Retention Rate Trend</h3></div></div>
+              <div class="chart-container"><canvas id="retentionTrendChart" aria-label="Retention Rate Trend Chart"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-file-contract"></i><h3>Retention by Contract</h3></div></div>
+              <div class="chart-container"><canvas id="retentionByContractChart" aria-label="Retention by Contract Chart"></canvas></div>
+            </div>
+          </div>
+
+          <div class="charts-row two-col">
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-layer-group"></i><h3>Retention by Segment</h3></div></div>
+              <div class="chart-container"><canvas id="retentionBySegmentChart" aria-label="Retention by Segment Chart"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-hourglass"></i><h3>Retention by Tenure Group</h3></div></div>
+              <div class="chart-container"><canvas id="retentionByTenureChart" aria-label="Retention by Tenure Chart"></canvas></div>
+            </div>
+          </div>
+
+          <!-- Retention Actions -->
+          <div class="card">
+            <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-lightbulb"></i><h3>Dynamic Retention Recommendations</h3></div></div>
+            <div id="retentionActions" class="retention-actions-grid"></div>
+          </div>
+        </section>
+
+        <!-- ─────────────── SECTION: COHORTS ─────────────── -->
+        <section id="section-cohorts" class="section" aria-label="Cohort Analysis">
+          <div class="section-header">
+            <h2><i class="fa-solid fa-table-cells"></i> Customer Cohort Analysis</h2>
+          </div>
+
+          <div class="card chart-card">
+            <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-table-cells-large"></i><h3>Cohort Retention Heatmap — % Retained Over Time</h3></div></div>
+            <div id="cohortHeatmapWrap" class="cohort-heatmap-wrap"></div>
+          </div>
+
+          <div class="charts-row two-col">
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-chart-line"></i><h3>Cohort Size Over Time</h3></div></div>
+              <div class="chart-container"><canvas id="cohortSizeChart" aria-label="Cohort Size Chart"></canvas></div>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-funnel-dollar"></i><h3>Customer Lifecycle Funnel</h3></div></div>
+              <div class="chart-container"><canvas id="lifecycleFunnelChart" aria-label="Lifecycle Funnel Chart"></canvas></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─────────────── SECTION: REPORTS ─────────────── -->
+        <section id="section-reports" class="section" aria-label="Reports">
+          <div class="section-header">
+            <h2><i class="fa-solid fa-file-chart-column"></i> Reports &amp; Analytics</h2>
+          </div>
+
+          <div class="reports-grid" id="reportsGrid"></div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title-wrap"><i class="fa-solid fa-download"></i><h3>Export Reports</h3></div>
+            </div>
+            <div class="export-actions-row">
+              <button class="export-btn" id="reportExportCsv" aria-label="Export report as CSV">
+                <i class="fa-solid fa-file-csv"></i>
+                <span>Export CSV Report</span>
+                <small>All customer data with predictions</small>
+              </button>
+              <button class="export-btn excel" id="reportExportExcel" aria-label="Export report as Excel">
+                <i class="fa-solid fa-file-excel"></i>
+                <span>Export Excel Report</span>
+                <small>5 sheets: Customers, Analysis, Drivers, Segments, Summary</small>
+              </button>
+              <button class="export-btn print" id="reportPrint" aria-label="Print report">
+                <i class="fa-solid fa-print"></i>
+                <span>Print Report</span>
+                <small>Browser print dialog</small>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─────────────── SECTION: DATA IMPORT ─────────────── -->
+        <section id="section-dataImport" class="section" aria-label="Data Import">
+          <div class="section-header">
+            <h2><i class="fa-solid fa-cloud-arrow-up"></i> Data Import</h2>
+          </div>
+
+          <div class="import-cards-row">
+            <div class="card import-card">
+              <div class="import-card-icon csv-icon">
+                <i class="fa-solid fa-file-csv"></i>
+              </div>
+              <h3>Import CSV</h3>
+              <p>Upload a .csv file with customer data. The system will automatically parse and update all analytics.</p>
+              <div class="drop-zone" id="csvDropZone" role="button" tabindex="0" aria-label="CSV drop zone">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <span>Drag &amp; Drop CSV file here</span>
+                <small>or click to browse</small>
+              </div>
+              <button class="import-btn csv-btn" id="importCsvBtnPage" aria-label="Browse for CSV file">
+                <i class="fa-solid fa-folder-open"></i> Browse CSV
+              </button>
+            </div>
+            <div class="card import-card">
+              <div class="import-card-icon excel-icon">
+                <i class="fa-solid fa-file-excel"></i>
+              </div>
+              <h3>Import Excel</h3>
+              <p>Upload a .xlsx or .xls file. SheetJS will parse all data and update the dashboard instantly.</p>
+              <div class="drop-zone" id="excelDropZone" role="button" tabindex="0" aria-label="Excel drop zone">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <span>Drag &amp; Drop Excel file here</span>
+                <small>or click to browse</small>
+              </div>
+              <button class="import-btn excel-btn" id="importExcelBtnPage" aria-label="Browse for Excel file">
+                <i class="fa-solid fa-folder-open"></i> Browse Excel
+              </button>
+            </div>
+          </div>
+
+          <!-- Data Quality Panel -->
+          <div class="card">
+            <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-clipboard-check"></i><h3>Data Quality Dashboard</h3></div></div>
+            <div class="data-quality-grid" id="dataQualityGrid"></div>
+          </div>
+
+          <!-- Expected Format -->
+          <div class="card">
+            <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-info-circle"></i><h3>Expected Data Format</h3></div></div>
+            <div class="format-info">
+              <p>Your CSV/Excel should contain customer data with the following columns (column names are flexible):</p>
+              <div class="format-columns-grid">
+                <span>customer_id</span><span>customer_name</span><span>age</span><span>gender</span>
+                <span>city</span><span>state</span><span>tenure_months</span><span>contract_type</span>
+                <span>subscription_plan</span><span>monthly_charges</span><span>total_charges</span>
+                <span>payment_method</span><span>satisfaction_score</span><span>support_tickets</span>
+                <span>churn</span><span>engagement_score</span><span>nps_score</span><span>late_payments</span>
+                <span>complaints</span><span>last_login_days</span><span>login_frequency</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ─────────────── SECTION: SETTINGS ─────────────── -->
+        <section id="section-settings" class="section" aria-label="Settings">
+          <div class="section-header">
+            <h2><i class="fa-solid fa-sliders"></i> Settings</h2>
+          </div>
+
+          <div class="settings-grid">
+            <div class="card settings-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-palette"></i><h3>Appearance</h3></div></div>
+              <div class="settings-form">
+                <div class="setting-row">
+                  <label>Theme</label>
+                  <select id="themeSelect" aria-label="Theme selection">
+                    <option value="dark">Dark (Default)</option>
+                    <option value="midnight">Midnight Blue</option>
+                    <option value="slate">Slate Dark</option>
+                  </select>
+                </div>
+                <div class="setting-row">
+                  <label>Animations</label>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="animationsToggle" checked aria-label="Toggle animations" />
+                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                  </label>
+                </div>
+                <div class="setting-row">
+                  <label>Compact Mode</label>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="compactModeToggle" aria-label="Toggle compact mode" />
+                    <span class="toggle-track"><span class="toggle-thumb"></span></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div class="card settings-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-database"></i><h3>Dataset</h3></div></div>
+              <div class="settings-form">
+                <div class="setting-row">
+                  <label>Dataset Size</label>
+                  <select id="datasetSizeSelect" aria-label="Dataset size selection">
+                    <option value="1000">1,000 records</option>
+                    <option value="2500">2,500 records</option>
+                    <option value="5000" selected>5,000 records</option>
+                    <option value="10000">10,000 records</option>
+                  </select>
+                </div>
+                <div class="setting-row">
+                  <label>Churn Rate Bias</label>
+                  <select id="churnBiasSelect" aria-label="Churn rate bias">
+                    <option value="low">Low (~15%)</option>
+                    <option value="medium" selected>Medium (~25%)</option>
+                    <option value="high">High (~35%)</option>
+                  </select>
+                </div>
+                <button class="settings-apply-btn" id="applySettingsBtn" aria-label="Apply settings">
+                  <i class="fa-solid fa-check"></i> Apply &amp; Regenerate
+                </button>
+              </div>
+            </div>
+
+            <div class="card settings-card">
+              <div class="card-header"><div class="card-title-wrap"><i class="fa-solid fa-shield-check"></i><h3>About</h3></div></div>
+              <div class="about-panel">
+                <div class="about-logo"><i class="fa-solid fa-brain-circuit"></i></div>
+                <h4>Customer Churn Intelligence</h4>
+                <p>v3.1.0 Enterprise Edition</p>
+                <p class="about-desc">Advanced Customer Retention &amp; Churn Prediction Analytics Platform</p>
+                <div class="about-tech-stack">
+                  <span>HTML5</span><span>CSS3</span><span>Vanilla JS</span><span>Chart.js</span><span>SheetJS</span>
+                </div>
+                <p class="disclaimer"><i class="fa-solid fa-flask"></i> Prediction engine uses a demo scoring model for demonstration purposes.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main><!-- /content-area -->
+    </div><!-- /main-wrapper -->
+  </div><!-- /app -->
+
+  <!-- ═══════════════════════════════════════════ CUSTOMER MODAL ═══ -->
+  <div id="customerModal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Customer Details" style="display:none">
+    <div class="modal-container" id="customerModalContainer">
+      <button class="modal-close" id="modalClose" aria-label="Close modal">&times;</button>
+      <div class="modal-content" id="customerModalContent"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ MOBILE OVERLAY ═══ -->
+  <div class="mobile-sidebar-overlay" id="mobileSidebarOverlay"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
